@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movies</title>
+  </head>
+  <style>
+     body{
+      margin: 0;
+    }
+    #navbar{
+      background-color: teal;
+      display: flex;
+      justify-content: space-between;
+      color: white;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    #search_bar{
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    #movies{
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 20px;
+      margin: auto;
+    }
+    #movies>div{
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-bottom: 10px;
+     align-items: center;
+    }
+    img{
+      width: 200px;
+      height: 250px;
+    }
+  </style>
+  <body>
+    <div id="navbar">
+      <h1>Movie List</h1>
+      <!-- Display the wallet amount here inside h1 tag with id as "wallet". Note only amount, no extra text. Like 500 not Rs 500 -->
+      <h1 id="wallet"></h1>
+    </div>
+    <div id="search_bar">
+      <!-- input box for searching movies with id as "search" -->
+      <!-- No button should be there for searching movies, it should search with input  -->
+      <input type="text" id="search" placeholder="Enter Movie Name" oninput="debounce(main,2000)">
+    </div>
+
+    <div id="movies">
+      <!-- Append all searched movies here in grid format -->
+      <!-- Every movie card should have image, title and a book now button  -->
+      <!-- Book now buttons should have class "book_now"  -->
+    </div>
+    <button id="checkout" onclick="checkout()">Checkout</button>
+  </body>
+</html>
+<script  >
+  // Implement debouncing for network request
+// On clicking book now store the selected movie in localstorage as key "movie"
+// so that you can retrive it on checkout.html page
+let temp;
+let tot=JSON.parse(localStorage.getItem("amount"))||0;
+document.getElementById("wallet").innerText=tot;
+async function moviefetch(){
+  try{
+    let data=document.getElementById("search").value;
+    let result=await fetch(`http://www.omdbapi.com/?s=${data}&apikey=d3b7fc36`);
+    let finaldata=await result.json();
+    return finaldata;
+  }
+ catch(err){
+   console.log(err);
+ }
+  
+}
+
+async function main(){
+let searchval= await moviefetch();
+if(searchval==undefined)
+return false;
+else
+{
+  display(searchval)
+}
+}
+
+function debounce(fun,time){
+ if(temp){
+   clearTimeout(temp);
+ }
+    temp =setTimeout(()=>{
+      fun();
+    },time)
+  
+}
+
+let itemarr=JSON.parse(localStorage.getItem("movie"))||[];
+function display(data){
+  document.getElementById("movies").innerText=null
+  let result=data.Search;
+  result.forEach(function (ele,index){
+    var bag=document.createElement("div");
+    bag.style.textAlign="center";
+    var img=document.createElement("img");
+    img.src=ele.Poster;
+    var name=document.createElement("h2");
+    name.innerText=ele.Title;
+    var but=document.createElement("button");
+    but.innerText="Book Now";
+    but.setAttribute("class","book_now");
+    but.onclick=()=>{
+      let p=result.slice(index,index+1)
+      itemarr.push(p);
+      localStorage.setItem("movie",JSON.stringify(itemarr));
+    }
+    bag.append(img,name,but);
+    bag.style.border="1px solid black"
+  
+    document.getElementById("movies").append(bag)
+    
+  });
+  
+}
+function checkout(){
+ window.location.href="checkout.html"
+}
+</script>
