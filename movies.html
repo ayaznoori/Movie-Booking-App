@@ -70,7 +70,7 @@ document.getElementById("wallet").innerText=tot;
 async function moviefetch(){
   try{
     let data=document.getElementById("search").value;
-    let result=await fetch(`http://www.omdbapi.com/?s=${data}&apikey=d3b7fc36`);
+    let result=await fetch(`https://www.omdbapi.com/?s=${data}&apikey=d3b7fc36`);
     let finaldata=await result.json();
     return finaldata;
   }
